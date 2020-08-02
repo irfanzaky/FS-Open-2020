@@ -3,14 +3,14 @@ import  ReactDOM  from  'react-dom'
 
 const  Header  =  (props)  =>{
     return(
-        <h1>{props.courseName}</h1>
+        <h1>{props.name}</h1>
     )
 }
 
 const Part = (props) => {
   return (
     <p>
-      {props.content.partName}  {props.content.partExcercise}
+      {props.content.name}  {props.content.exercise}
     </p>
   )
 }
@@ -33,26 +33,28 @@ const  Total  =  (props)  =>{
 }
 
 const  App  =  ()  =>  {
-    const course = { 
-      courseName: 'Half Stack application development',
-      courseContent: [{
-        partName: 'Fundamentals of React',
-        partExcercise: 10,
-      },
-      {
-        partName: 'Using props to pass data',
-        partExcercise: 7,
-      },
-      {
-        partName: 'State of a component',
-        partExcercise: 14,
-      }]
+    const course = {
+      name: 'Half Stack application development',
+      parts: [
+        {
+          name: 'Fundamentals of React',
+          exercises: 10
+        },
+        {
+          name: 'Using props to pass data',
+          exercises: 7
+        },
+        {
+          name: 'State of a component',
+          exercises: 14
+        }
+      ]
     }
   return (
     <div>
-      <Header courseName = {course.courseName}  />
-            <Content  content  =  {course.courseContent}/>
-            <Total  totalExcercise  =  {course.courseContent.reduce((acc, part)  =>  acc  +  part.partExcercise,  0)}/>
+      <Header name = {course.name}  />
+            <Content  content  =  {course.parts}/>
+            <Total  totalExcercise  =  {course.parts.reduce((acc, part)  =>  acc  +  part.exercise,  0)}/>
         </div>
     )
 }
