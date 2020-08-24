@@ -4,8 +4,7 @@ import ReactDOM from "react-dom";
 const Statistic = ({ text, value }) => {
   return (
     <tr>
-      <td>{text}</td>
-      <td>{value} </td>
+      <td>{text}</td> <td>{value} </td>
     </tr>
   );
 };
