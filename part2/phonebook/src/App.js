@@ -6,12 +6,19 @@ const App = () => {
 
   function handleAddName(event) {
     event.preventDefault();
-    console.log("new name added", event.target);
-    const newNametoAdd = {
-      name: newName,
-    };
-    setPersons(persons.concat(newNametoAdd));
+    const newNametoAdd = { name: newName };
+    const checkPerson = persons.filter((person) => person.name === newName).length;
+    //console.log(persons, newNametoAdd, checkPerson);
+
+    if (checkPerson) {
+      alert(`${newName} is already added to phonebook`);
+      console.log(`${newName} is already added to phonebook`);
+    } else {
+      setPersons(persons.concat(newNametoAdd));
+      console.log("new name added", event.target);
+    }
   }
+
   function handleInputChange(event) {
     console.log(event.target.value);
     setNewName(event.target.value);
