@@ -17,39 +17,38 @@ const App = () => {
     console.log(event.target.value, filteredCountries);
     setNewSearch(event.target.value);
   }
+  function handleSelectCountry({ country }) {
+    console.log("this clicked from this country", country, country.name);
+    setNewSearch(country.name);
+  }
 
   const filteredCountries = countries.filter((countr) => countr.name.includes(newSearch));
 
   return (
     <div>
-      <Filter
-        newSearch={newSearch}
-        filteredCountries={filteredCountries}
-        handleSearchChange={handleSearchChange}
-      />
+      <form>
+        filter countries:
+        <input value={newSearch} onChange={handleSearchChange} />
+        <br />
+      </form>
+
+      <Country countries={filteredCountries} handleSelectCountry={handleSelectCountry} />
     </div>
   );
 };
 
-const Filter = ({ newSearch, handleSearchChange, filteredCountries }) => (
-  <div>
-    <form>
-      filter countries:
-      <input value={newSearch} onChange={handleSearchChange} />
-      <br />
-    </form>
-
-    <Country countries={filteredCountries} />
-  </div>
-);
-
-const Country = ({ countries }) => {
+const Country = ({ countries, handleSelectCountry }) => {
   if (countries.length > 10) {
     return <div>Too many matches, specify another filter</div>;
   } else if (countries.length === 0) {
     return <div>No country match the filter, specify another filter</div>;
   } else if (countries.length > 1) {
-    return countries.map((country) => <div key={country.name}>{country.name}</div>);
+    return countries.map((country) => (
+      <div key={country.name}>
+        {country.name}
+        <button onClick={() => handleSelectCountry({ country })}>show</button>
+      </div>
+    ));
   } else
     return (
       <div>
