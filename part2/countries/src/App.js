@@ -114,7 +114,7 @@ const Weather = ({ country, API_KEY }) => {
     return (
       <div>
         <h2>Weather in Helsinki</h2>
-        <b>temperature:</b> {JSON.stringify(weatherData.current.temperature)}
+        <b>temperature:</b> {weatherData.current.temperature}
         <br />
         <img
           src={weatherData.current.weather_icons}

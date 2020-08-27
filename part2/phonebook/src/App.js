@@ -25,7 +25,9 @@ const App = () => {
       alert(`${newName} is already added to phonebook`);
       console.log(`${newName} is already added to phonebook`);
     } else {
-      setPersons(persons.concat(newPersontoAdd));
+      axios.post("http://localhost:3001/persons", newPersontoAdd).then((response) => {
+        setPersons(persons.concat(response.data));
+      });
       console.log("new name added", event.target);
     }
   }
