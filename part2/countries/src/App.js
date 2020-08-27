@@ -4,6 +4,7 @@ import axios from "axios";
 const App = () => {
   const [newSearch, setNewSearch] = useState("");
   const [countries, setCountries] = useState([]);
+  const API_KEY = process.env.REACT_APP_API_KEY;
 
   useEffect(() => {
     console.log("effect");
@@ -32,12 +33,16 @@ const App = () => {
         <br />
       </form>
 
-      <Country countries={filteredCountries} handleSelectCountry={handleSelectCountry} />
+      <Country
+        countries={filteredCountries}
+        handleSelectCountry={handleSelectCountry}
+        API_KEY={API_KEY}
+      />
     </div>
   );
 };
 
-const Country = ({ countries, handleSelectCountry }) => {
+const Country = ({ countries, handleSelectCountry, API_KEY }) => {
   if (countries.length > 10) {
     return <div>Too many matches, specify another filter</div>;
   } else if (countries.length === 0) {
@@ -69,6 +74,63 @@ const Country = ({ countries, handleSelectCountry }) => {
           width="300"
           height="200"
         ></img>
+
+        <Weather country={countries[0].name} API_KEY={API_KEY} />
+      </div>
+    );
+};
+
+const Weather = ({ country, API_KEY }) => {
+  const [weatherData, setWeatherData] = useState({
+    request: { type: "City", query: "Singapore, Singapore", language: "en", unit: "m" },
+    location: {
+      name: "Singapore",
+      country: "Singapore",
+    },
+    current: {
+      observation_time: "05:09 AM",
+      temperature: 31,
+      weather_icons: [
+        "https://assets.weatherstack.com/images/wsymbols01_png_64/wsymbol_0002_sunny_intervals.png",
+      ],
+      weather_descriptions: ["Partly cloudy"],
+      wind_speed: 17,
+    },
+  });
+
+  useEffect(getWeather, [country]);
+
+  function getWeather() {
+    const url = `http://api.weatherstack.com/current?access_key=${API_KEY}&query=${country}`;
+    console.log("effect onto", url);
+    axios.get(url).then((response) => {
+      console.log("promise fulfilled", response.data);
+      console.log("setting up API_KEY into: ", API_KEY);
+      setWeatherData(response.data);
+    });
+  }
+
+  if ("temperature" in weatherData.current)
+    return (
+      <div>
+        <h2>Weather in Helsinki</h2>
+        <b>temperature:</b> {JSON.stringify(weatherData.current.temperature)}
+        <br />
+        <img
+          src={weatherData.current.weather_icons}
+          alt="weather Icon"
+          width="100"
+          height="100"
+        ></img>
+        <br />
+        <b>wind:</b> {weatherData.current.wind_speed} mph direction {weatherData.current.wind_dir}
+      </div>
+    );
+  else
+    return (
+      <div>
+        <h2>Weather in Helsinki</h2>
+        <h3>temperature: Loading...</h3>
       </div>
     );
 };
