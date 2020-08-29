@@ -1,35 +1,65 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import PersonService from "./services/persons";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const App = () => {
+  // Application's State
   const [newName, setNewName] = useState("Irfan");
   const [newNumber, setNewNumber] = useState("831-1823-1238");
   const [newSearch, setNewSearch] = useState("");
-  const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState([
+    {
+      name: "Irfan",
+      number: "831-1823-1238",
+      id: 15,
+    },
+  ]);
 
+  // Application's Effect
   useEffect(() => {
     console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
-      setPersons(response.data);
+    PersonService.getAll().then((data) => {
+      console.log("promise fulfilled", data);
+      setPersons(data);
     });
   }, []);
 
+  // Application's events handler
   function handleAddName(event) {
     event.preventDefault();
-    const newPersontoAdd = { name: newName, number: newNumber };
-    const checkPerson = persons.filter((person) => person.name === newName).length;
-    //console.log(persons, newPersontoAdd, checkPerson);
+    const newPerson = { name: newName, number: newNumber };
+    const currentPerson = persons.filter((person) => person.name === newName);
 
-    if (checkPerson) {
-      alert(`${newName} is already added to phonebook`);
-      console.log(`${newName} is already added to phonebook`);
+    console.log("adding new name", currentPerson, newName);
+
+    if (currentPerson.length) {
+      const confirmation = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+      if (confirmation) {
+        PersonService.update(currentPerson[0].id, newPerson).then((res) => {
+          setPersons(persons.filter((p) => p.id !== res.id).concat(res));
+        });
+        console.log("new name updated");
+      } else console.log("new name not updated");
     } else {
-      axios.post("http://localhost:3001/persons", newPersontoAdd).then((response) => {
-        setPersons(persons.concat(response.data));
+      PersonService.create(newPerson).then((response) => {
+        console.log(response);
+        setPersons(persons.concat(response));
       });
       console.log("new name added", event.target);
     }
+  }
+
+  function handleDelete(personToDelete) {
+    // eslint-disable-next-line no-restricted-globals
+    const confirmToDelete = confirm(`Are you sure to delete ${personToDelete.name} ?`);
+    if (confirmToDelete) {
+      setPersons(persons.filter((person) => person.name !== personToDelete.name));
+      PersonService.remove(personToDelete).then((response) => console.log(response));
+    } else alert("Deletion canceled");
   }
 
   function handleNameChange(event) {
@@ -66,47 +96,9 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Person persons={persons} />
+      <Persons persons={persons} handleDelete={handleDelete} />
     </div>
   );
-};
-
-const Filter = ({ newSearch, handleSearchChange, filteredPerson }) => (
-  <div>
-    <form>
-      filter shown with:
-      <input value={newSearch} onChange={handleSearchChange} />
-      <br />
-    </form>
-    <Person persons={filteredPerson} />
-  </div>
-);
-
-const PersonForm = ({
-  handleAddName,
-  handleNameChange,
-  handleNumberChange,
-  newNumber,
-  newName,
-}) => (
-  <div>
-    <form onSubmit={handleAddName}>
-      name: <input value={newName} onChange={handleNameChange} />
-      <br />
-      number: <input value={newNumber} onChange={handleNumberChange} />
-      <br />
-      <button type="submit">add</button>
-      <br />
-    </form>
-  </div>
-);
-
-const Person = ({ persons }) => {
-  return persons.map((person) => (
-    <div key={person.name}>
-      {person.name} {person.number}
-    </div>
-  ));
 };
 
 export default App;
